@@ -1,0 +1,47 @@
+name: Relay Stream
+on:
+  workflow_dispatch:
+    inputs:
+      start_delay:
+        description: 'Minutes avant démarrage'
+        default: '0'
+
+jobs:
+  relay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          pip install yt-dlp
+
+      - name: Wait for start
+        run: sleep $((${{ github.event.inputs.start_delay }} * 60))
+
+      - name: Relay when live
+        env:
+          RTMP_URL: ${{ secrets.RTMP_URL }}
+        run: |
+          SOURCE_URL="https://www.youtube.com/watch?v=nKXVoA5vdd0"
+          END_TIME=$(( $(date +%s) + 10800 ))  # 3h de marge
+
+          while true; do
+            NOW=$(date +%s)
+            if [ "$NOW" -ge "$END_TIME" ]; then
+              echo "Limite atteinte, arrêt."
+              break
+            fi
+            STATUS=$(yt-dlp --no-warnings -O "%(is_live)s" "$SOURCE_URL" 2>/dev/null)
+            if [ "$STATUS" = "True" ]; then
+              echo "Live détecté, capture..."
+              STREAM_URL=$(yt-dlp -g -f best "$SOURCE_URL" 2>/dev/null)
+              ffmpeg -re -i "$STREAM_URL" -c copy -f flv "$RTMP_URL"
+              echo "Flux source terminé."
+              break
+            else
+              echo "Pas encore live, attente 30s..."
+              sleep 30
+            fi
+          done
