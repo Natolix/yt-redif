@@ -34,11 +34,11 @@ jobs:
               echo "Limite atteinte, arrêt."
               break
             fi
-            STATUS=$(yt-dlp --no-warnings -O "%(is_live)s" "$SOURCE_URL" 2>&1)
+            STATUS=$(yt-dlp --no-warnings -O "%(is_live)s" "$SOURCE_URL" 2>&1 || true)
             echo "Status actuel : $STATUS"
             if [ "$STATUS" = "True" ]; then
               echo "Live détecté, capture..."
-              STREAM_URL=$(yt-dlp -g -f best "$SOURCE_URL" 2>&1)
+              STREAM_URL=$(yt-dlp -g -f best "$SOURCE_URL" 2>&1 || true)
               timeout 30 ffmpeg -re -i "$STREAM_URL" -c copy -f flv "$RTMP_URL"
               echo "Test de capture terminé (30s)."
               break
