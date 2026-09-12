@@ -4,7 +4,7 @@ on:
     inputs:
       start_delay:
         description: 'Minutes avant démarrage'
-        default: '0'
+        default: '326'
 
 jobs:
   relay:
@@ -26,7 +26,7 @@ jobs:
         run: |
           set -x
           SOURCE_URL="https://www.youtube.com/watch?v=nKXVoA5vdd0"
-          END_TIME=$(( $(date +%s) + 120 ))
+          END_TIME=$(( $(date +%s) + 10800 ))
 
           while true; do
             NOW=$(date +%s)
@@ -39,8 +39,8 @@ jobs:
             if [ "$STATUS" = "True" ]; then
               echo "Live détecté, capture..."
               STREAM_URL=$(yt-dlp -g -f best "$SOURCE_URL" 2>&1 || true)
-              timeout 30 ffmpeg -re -i "$STREAM_URL" -c copy -f flv "$RTMP_URL"
-              echo "Test de capture terminé (30s)."
+              ffmpeg -re -i "$STREAM_URL" -c copy -f flv "$RTMP_URL"
+              echo "Flux source terminé."
               break
             else
               echo "Pas encore live, attente 10s..."
