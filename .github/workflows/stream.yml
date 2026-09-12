@@ -24,8 +24,9 @@ jobs:
         env:
           RTMP_URL: ${{ secrets.RTMP_URL }}
         run: |
+          set -x
           SOURCE_URL="https://www.youtube.com/watch?v=nKXVoA5vdd0"
-          END_TIME=$(( $(date +%s) + 120 ))  # test : 2 min max
+          END_TIME=$(( $(date +%s) + 120 ))
 
           while true; do
             NOW=$(date +%s)
@@ -33,11 +34,11 @@ jobs:
               echo "Limite atteinte, arrêt."
               break
             fi
-            STATUS=$(yt-dlp --no-warnings -O "%(is_live)s" "$SOURCE_URL" 2>/dev/null)
+            STATUS=$(yt-dlp --no-warnings -O "%(is_live)s" "$SOURCE_URL" 2>&1)
             echo "Status actuel : $STATUS"
             if [ "$STATUS" = "True" ]; then
               echo "Live détecté, capture..."
-              STREAM_URL=$(yt-dlp -g -f best "$SOURCE_URL" 2>/dev/null)
+              STREAM_URL=$(yt-dlp -g -f best "$SOURCE_URL" 2>&1)
               timeout 30 ffmpeg -re -i "$STREAM_URL" -c copy -f flv "$RTMP_URL"
               echo "Test de capture terminé (30s)."
               break
@@ -46,3 +47,4 @@ jobs:
               sleep 10
             fi
           done
+          exit 0
