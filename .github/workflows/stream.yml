@@ -22,7 +22,10 @@ jobs:
           YT_COOKIES_4: ${{ secrets.YT_COOKIES_4 }}
         run: |
           set -x
-          echo "$YT_COOKIES_1$YT_COOKIES_2$YT_COOKIES_3$YT_COOKIES_4" > cookies.txt
+          printf '%s\n' "$YT_COOKIES_1" > cookies.txt
+          printf '%s\n' "$YT_COOKIES_2" >> cookies.txt
+          printf '%s\n' "$YT_COOKIES_3" >> cookies.txt
+          printf '%s\n' "$YT_COOKIES_4" >> cookies.txt
 
           URLS=(
             "https://www.youtube.com/watch?v=Ber6THKTR-A"
