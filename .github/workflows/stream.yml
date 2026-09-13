@@ -16,17 +16,23 @@ jobs:
       - name: Stream videos in sequence
         env:
           RTMP_URL: ${{ secrets.RTMP_URL }}
+          YT_COOKIES_1: ${{ secrets.YT_COOKIES_1 }}
+          YT_COOKIES_2: ${{ secrets.YT_COOKIES_2 }}
+          YT_COOKIES_3: ${{ secrets.YT_COOKIES_3 }}
+          YT_COOKIES_4: ${{ secrets.YT_COOKIES_4 }}
         run: |
           set -x
+          echo "$YT_COOKIES_1$YT_COOKIES_2$YT_COOKIES_3$YT_COOKIES_4" > cookies.txt
+
           URLS=(
             "https://www.youtube.com/watch?v=Ber6THKTR-A"
             "https://www.youtube.com/watch?v=3U1x09j4yGY"
-            "https://www.youtube.com/watch?v=Bml-VSsDxzc"
+            "https://www.youtube.com/watch?v=WBiiTx2ImbQ"
           )
 
           for SOURCE_URL in "${URLS[@]}"; do
             echo "=== Streaming : $SOURCE_URL ==="
-            STREAM_URL=$(yt-dlp -g -f best "$SOURCE_URL" 2>&1 || true)
+            STREAM_URL=$(yt-dlp --cookies cookies.txt -g -f b "$SOURCE_URL" 2>&1 || true)
             ffmpeg -re -i "$STREAM_URL" -c copy -f flv "$RTMP_URL"
             echo "Vidéo terminée, passage à la suivante."
           done
