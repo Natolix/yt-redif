@@ -21,9 +21,9 @@ jobs:
             "https://github.com/Natolix/yt-redif/releases/download/v1/Roblox.Innovation.Awards.coupee.mkv"
           )
 
-          for VIDEO_URL in "${URLS[@]}"; do
-            echo "=== Streaming : $VIDEO_URL ==="
-            ffmpeg -re -i "$VIDEO_URL" -c copy -f flv "$RTMP_URL"
-            echo "Vidéo terminée, passage à la suivante."
+            for VIDEO_URL in "${URLS[@]}"; do
+              echo "=== Streaming : $VIDEO_URL ==="
+              ffmpeg -re -i "$VIDEO_URL" -c:v copy -c:a aac -ar 44100 -b:a 128k -f flv "$RTMP_URL"
+              echo "Vidéo terminée, passage à la suivante."
           done
           exit 0
