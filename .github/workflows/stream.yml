@@ -15,15 +15,14 @@ jobs:
           RTMP_URL: ${{ secrets.RTMP_URL }}
         run: |
           set -x
-          URLS=(
-            "https://github.com/Natolix/yt-redif/releases/download/v1/RDC26.Opening.Keynote.4vxV5T8xTJw.webm"
-            "https://github.com/Natolix/yt-redif/releases/download/v1/RDC26.Creator.Keynote.mkv"
-            "https://github.com/Natolix/yt-redif/releases/download/v1/Roblox.Innovation.Awards.coupee.mkv"
-          )
 
-            for VIDEO_URL in "${URLS[@]}"; do
-              echo "=== Streaming : $VIDEO_URL ==="
-              ffmpeg -re -i "$VIDEO_URL" -c:v copy -c:a aac -ar 44100 -b:a 128k -f flv "$RTMP_URL"
-              echo "Vidéo terminée, passage à la suivante."
-          done
+          echo "=== Streaming : Opening Keynote ==="
+          ffmpeg -re -ss 00:57:47 -to 03:02:39 -i "https://github.com/Natolix/yt-redif/releases/download/v1/RDC26.Opening.Keynote.4vxV5T8xTJw.webm" -c:v copy -c:a aac -ar 44100 -b:a 128k -f flv "$RTMP_URL"
+
+          echo "=== Streaming : Creator Keynote ==="
+          ffmpeg -re -ss 00:23:11 -to 01:39:28 -i "https://github.com/Natolix/yt-redif/releases/download/v1/RDC26.Creator.Keynote.mkv" -c:v copy -c:a aac -ar 44100 -b:a 128k -f flv "$RTMP_URL"
+
+          echo "=== Streaming : Roblox Innovation Awards ==="
+          ffmpeg -re -i "https://github.com/Natolix/yt-redif/releases/download/v1/Roblox.Innovation.Awards.coupee.mkv" -c:v copy -c:a aac -ar 44100 -b:a 128k -f flv "$RTMP_URL"
+
           exit 0
