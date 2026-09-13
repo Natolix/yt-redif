@@ -8,35 +8,22 @@ jobs:
     timeout-minutes: 360
     steps:
       - name: Install deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
-          pip install yt-dlp
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Stream videos in sequence
         env:
           RTMP_URL: ${{ secrets.RTMP_URL }}
-          YT_COOKIES_1: ${{ secrets.YT_COOKIES_1 }}
-          YT_COOKIES_2: ${{ secrets.YT_COOKIES_2 }}
-          YT_COOKIES_3: ${{ secrets.YT_COOKIES_3 }}
-          YT_COOKIES_4: ${{ secrets.YT_COOKIES_4 }}
         run: |
           set -x
-          printf '%s\n' "$YT_COOKIES_1" > cookies.txt
-          printf '%s\n' "$YT_COOKIES_2" >> cookies.txt
-          printf '%s\n' "$YT_COOKIES_3" >> cookies.txt
-          printf '%s\n' "$YT_COOKIES_4" >> cookies.txt
-
           URLS=(
-            "https://www.youtube.com/watch?v=Ber6THKTR-A"
-            "https://www.youtube.com/watch?v=3U1x09j4yGY"
-            "https://www.youtube.com/watch?v=WBiiTx2ImbQ"
+            "https://github.com/Natolix/yt-redif/releases/download/v1/RDC26.Opening.Keynote.4vxV5T8xTJw.webm"
+            "https://github.com/Natolix/yt-redif/releases/download/v1/RDC26.Creator.Keynote.mkv"
+            "https://github.com/Natolix/yt-redif/releases/download/v1/Roblox.Innovation.Awards.coupee.mkv"
           )
 
-          for SOURCE_URL in "${URLS[@]}"; do
-            echo "=== Streaming : $SOURCE_URL ==="
-            STREAM_URL=$(yt-dlp --cookies cookies.txt -g -f b "$SOURCE_URL" 2>&1 || true)
-            ffmpeg -re -i "$STREAM_URL" -c copy -f flv "$RTMP_URL"
+          for VIDEO_URL in "${URLS[@]}"; do
+            echo "=== Streaming : $VIDEO_URL ==="
+            ffmpeg -re -i "$VIDEO_URL" -c copy -f flv "$RTMP_URL"
             echo "Vidéo terminée, passage à la suivante."
           done
           exit 0
